@@ -343,12 +343,16 @@ github::_write_launcher() {
 
 # A launcher that differs from the release's counts as missing, so a newer release replaces it
 github::_app_linked() {
-	local name="$1" launcher
+	local name="$1" launcher file
 	[[ -L "${HOME}/.local/bin/${name}" ]] || return 1
 	for launcher in "$2/share/applications/"*.desktop; do
 		cmp -s "${XDG_DATA_HOME:-${HOME}/.local/share}/applications/${launcher##*/}" \
 			<(github::_write_launcher "${name}" "${launcher}") || return 1
 	done
+	# A release can add an icon, such as a tray icon, which counts as missing until it is linked
+	while IFS= read -r file; do
+		[[ -e "${XDG_DATA_HOME:-${HOME}/.local/share}/${file#"$2"/share/}" ]] || return 1
+	done < <(find "$2/share/icons" "$2/share/metainfo" -type f 2>/dev/null)
 }
 
 github::_link_app() {
