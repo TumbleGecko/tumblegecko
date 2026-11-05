@@ -325,13 +325,24 @@ github::_install_archive() {
 # Desktop apps
 
 # Install a desktop app from a release archive that holds its program next to a share/ folder
-# The archive is unpacked into ~/.local/share/tumblegecko/apps/<name>, and the program, launchers, icons and notes are
-# linked into ~/.local, so the app shows up in the menu and a newer release replaces it in place
+# The archive is unpacked into ~/.local/share/tumblegecko/apps/<name>, and the program, launchers, icons, notes and file
+# types are linked into ~/.local, so the app shows up in the menu and a newer release replaces it in place
 want::github_app() {
 	local repository="$1" pattern="$2" name="$3" destination
 	destination="${XDG_DATA_HOME:-${HOME}/.local/share}/tumblegecko/apps/${name}"
 	want::github_archive "${repository}" "${pattern}" "${destination}" --strip 1 "${@:4}"
 	task::requirement "Add ${name} to the menu" "" github::_app_linked github::_link_app "${name}" "${destination}"
+}
+
+# The folders under a release's share/ whose files are linked into ~/.local/share as they are
+GITHUB_APP_LINKED_FOLDERS=(icons metainfo mime/packages)
+
+github::_linked_files() {
+	local folder
+	for folder in "${GITHUB_APP_LINKED_FOLDERS[@]}"; do
+		[[ -d "$1/share/${folder}" ]] && find "$1/share/${folder}" -type f
+	done
+	return 0
 }
 
 # The launchers name the program only, so each is written out with its full path and works before the PATH is set
@@ -349,10 +360,10 @@ github::_app_linked() {
 		cmp -s "${XDG_DATA_HOME:-${HOME}/.local/share}/applications/${launcher##*/}" \
 			<(github::_write_launcher "${name}" "${launcher}") || return 1
 	done
-	# A release can add an icon, such as a tray icon, which counts as missing until it is linked
+	# A release can add a file, such as a tray icon or a file type, which counts as missing until it is linked
 	while IFS= read -r file; do
 		[[ -e "${XDG_DATA_HOME:-${HOME}/.local/share}/${file#"$2"/share/}" ]] || return 1
-	done < <(find "$2/share/icons" "$2/share/metainfo" -type f 2>/dev/null)
+	done < <(github::_linked_files "$2")
 }
 
 github::_link_app() {
@@ -365,9 +376,12 @@ github::_link_app() {
 	while IFS= read -r file; do
 		target="${data}/${file#"${destination}"/share/}"
 		mkdir -p "${target%/*}" && ln -sfn "${file}" "${target}" || return 1
-	done < <(find "${destination}/share/icons" "${destination}/share/metainfo" -type f 2>/dev/null)
+	done < <(github::_linked_files "${destination}")
 	update-desktop-database "${data}/applications" >/dev/null 2>&1 || true
 	gtk-update-icon-cache --quiet --ignore-theme-index "${data}/icons/hicolor" >/dev/null 2>&1 || true
+	if [[ -d "${destination}/share/mime/packages" ]]; then
+		update-mime-database "${data}/mime" >/dev/null 2>&1 || true
+	fi
 }
 
 

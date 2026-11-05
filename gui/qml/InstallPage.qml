@@ -64,7 +64,7 @@ Item {
 				}
 
 				Text {
-					text: install.running ? (window.runningTask ? "Now: " + window.runningTask : "Starting…")
+					text: install.running ? (window.runningTask ? "Now: " + window.runningTask : "Starting...")
 						: "Every chosen task has run."
 					color: Theme.muted
 					font.pixelSize: 18

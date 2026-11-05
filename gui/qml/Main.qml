@@ -140,7 +140,7 @@ ApplicationWindow {
 				runLog = runLog.concat([event.line]).slice(-400)
 			} else if (event.event === "requirement") {
 				const marks = {
-					"satisfied": "✓ in place", "applied": "✓ done", "failed": "✗ failed", "skipped": "· skipped"
+					"satisfied": "✓ in place", "applied": "✓ done", "failed": "✗ failed", "skipped": "○ skipped"
 				}
 				const mark = marks[event.state] || event.state
 				runLog = runLog.concat([mark + "   " + event.text]).slice(-400)

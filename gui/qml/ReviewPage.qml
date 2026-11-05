@@ -121,7 +121,7 @@ PageFrame {
 
 		Text {
 			visible: window.checking
-			text: "Still checking what is already in place…"
+			text: "Still checking what is already in place..."
 			color: Theme.muted
 		}
 

@@ -159,7 +159,7 @@ Item {
 						delegate: Text {
 							required property string modelData
 							width: reasons.width
-							text: "•  " + modelData
+							text: "○  " + modelData
 							color: Theme.text
 							wrapMode: Text.WordWrap
 						}

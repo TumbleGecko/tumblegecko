@@ -49,5 +49,5 @@ task() {
 	want::packages --no-recommends MozillaFirefox MozillaFirefox-branding-openSUSE
 	want::default_browser firefox.desktop
 	want::file /etc/firefox/policies/policies.json firefox_policies --root
-	want::kwin_rule firefox "title=— Mozilla Firefox" titlematch=2 sizerule=3 size=2160,1350
+	want::kwin_rule firefox "title=Mozilla Firefox" titlematch=2 sizerule=3 size=2160,1350
 }

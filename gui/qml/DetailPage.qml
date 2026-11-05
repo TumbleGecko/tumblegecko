@@ -118,7 +118,7 @@ PageFrame {
 
 						Text {
 							text: requirement.stepState === "satisfied" ? "✓"
-								: requirement.stepState === "unknown" ? "?" : "•"
+								: requirement.stepState === "unknown" ? "?" : "○"
 							color: requirement.stepState === "satisfied" ? Theme.accentHover : Theme.muted
 							font.weight: Font.Bold
 						}
