@@ -21,9 +21,6 @@
 #
 # dolphin-plugins is KDE's own version control integration, which Dolphin enables by the plugin name Git
 # Source is enabledPlugins.contains(p.name()) in dolphin versioncontrolobserver.cpp
-#
-# Its "Show Local Changes" runs git difftool --dir-diff, which waits on a terminal unless difftool.prompt is false
-# kompare can only diff and kdiff3 can merge, so they become diff.tool and merge.tool unless you chose others
 
 PROJECTS="${HOME}/Projects"
 PLACES="${HOME}/.local/share/user-places.xbel"
@@ -114,10 +111,7 @@ task() {
 	done
 	want::kconfig "${HOME}/Pictures/.directory" "Desktop Entry" Icon folder-pictures
 	want::kconfig "${HOME}/Pictures/Screenshots/.directory" "Desktop Entry" Icon folder-pictures
-	want::packages --no-recommends dolphin-plugins kdiff3 kompare
+	want::packages --no-recommends dolphin-plugins
 	want::kconfig_list_item dolphinrc VersionControl enabledPlugins Git
-	want::git_config diff.tool kompare --unless-set
-	want::git_config merge.tool kdiff3 --unless-set
-	want::git_config difftool.prompt false
 	restart::if_changed "Dolphin shows these after you open it again"
 }

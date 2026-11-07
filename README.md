@@ -75,7 +75,7 @@ Updates, apps, health, snapshots, drivers and help, all in one window.
 
 ### Crimson apps
 
-[Crimson Code](https://github.com/Crimson-Org/crimson-code), [Crimson Text](https://github.com/Crimson-Org/crimson-text), [Crimson Pixel](https://github.com/Crimson-Org/crimson-pixel), [Crimson Mesh](https://github.com/Crimson-Org/crimson-mesh) and [Crimson Music](https://github.com/Crimson-Org/crimson-music) are the main apps for code, text, editing pictures, 3D models and YouTube Music playlists.
+[Crimson Code](https://github.com/Crimson-Org/crimson-code), [Crimson Text](https://github.com/Crimson-Org/crimson-text), [Crimson Pixel](https://github.com/Crimson-Org/crimson-pixel), [Crimson Mesh](https://github.com/Crimson-Org/crimson-mesh), [Crimson Music](https://github.com/Crimson-Org/crimson-music) and [Crimson Changes](https://github.com/Crimson-Org/crimson-changes) are the main apps for code, text, editing pictures, 3D models, YouTube Music playlists and Git history.
 
 ### Guardrails
 

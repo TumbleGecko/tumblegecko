@@ -345,6 +345,17 @@ github::_linked_files() {
 	return 0
 }
 
+# The folders under a release's share/ that hold launchers, for the app menu and Dolphin's right-click menu
+GITHUB_APP_LAUNCHER_FOLDERS=(applications kio/servicemenus)
+
+github::_launchers() {
+	local folder
+	for folder in "${GITHUB_APP_LAUNCHER_FOLDERS[@]}"; do
+		[[ -d "$1/share/${folder}" ]] && find "$1/share/${folder}" -type f -name '*.desktop'
+	done
+	return 0
+}
+
 # The launchers name the program only, so each is written out with its full path and works before the PATH is set
 github::_write_launcher() {
 	local name="$1" file="$2"
@@ -354,15 +365,14 @@ github::_write_launcher() {
 
 # A launcher that differs from the release's counts as missing, so a newer release replaces it
 github::_app_linked() {
-	local name="$1" launcher file
+	local name="$1" launcher file data="${XDG_DATA_HOME:-${HOME}/.local/share}"
 	[[ -L "${HOME}/.local/bin/${name}" ]] || return 1
-	for launcher in "$2/share/applications/"*.desktop; do
-		cmp -s "${XDG_DATA_HOME:-${HOME}/.local/share}/applications/${launcher##*/}" \
-			<(github::_write_launcher "${name}" "${launcher}") || return 1
-	done
+	while IFS= read -r launcher; do
+		cmp -s "${data}/${launcher#"$2"/share/}" <(github::_write_launcher "${name}" "${launcher}") || return 1
+	done < <(github::_launchers "$2")
 	# A release can add a file, such as a tray icon or a file type, which counts as missing until it is linked
 	while IFS= read -r file; do
-		[[ -e "${XDG_DATA_HOME:-${HOME}/.local/share}/${file#"$2"/share/}" ]] || return 1
+		[[ -e "${data}/${file#"$2"/share/}" ]] || return 1
 	done < <(github::_linked_files "$2")
 }
 
@@ -370,9 +380,12 @@ github::_link_app() {
 	local name="$1" destination="$2" data="${XDG_DATA_HOME:-${HOME}/.local/share}" file target
 	mkdir -p "${HOME}/.local/bin" "${data}/applications" || return 1
 	ln -sfn "${destination}/${name}" "${HOME}/.local/bin/${name}" || return 1
-	for file in "${destination}/share/applications/"*.desktop; do
-		github::_write_launcher "${name}" "${file}" > "${data}/applications/${file##*/}" || return 1
-	done
+	# A service menu is only read from a user folder when executable, so each launcher keeps the release's mode
+	while IFS= read -r file; do
+		target="${data}/${file#"${destination}"/share/}"
+		mkdir -p "${target%/*}" && github::_write_launcher "${name}" "${file}" > "${target}" \
+			&& chmod --reference="${file}" "${target}" || return 1
+	done < <(github::_launchers "${destination}")
 	while IFS= read -r file; do
 		target="${data}/${file#"${destination}"/share/}"
 		mkdir -p "${target%/*}" && ln -sfn "${file}" "${target}" || return 1
